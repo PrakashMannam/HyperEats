@@ -10,6 +10,7 @@ import com.prakash.hypereats.exception.ResourceNotFoundException;
 import com.prakash.hypereats.repository.MenuItemRepository;
 import com.prakash.hypereats.repository.RestaurantRepository;
 
+
 @Service
 public class MenuItemService {
   
@@ -32,5 +33,21 @@ public class MenuItemService {
   
   public List<MenuItem> getMenuItemsByRestaurant(Long restaurantId) {
     return menuItemRepository.findByRestaurantId(restaurantId);
+  }
+
+  public MenuItem getMenuItemById(Long id) {
+    return menuItemRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Menu Item not found with id: " + id));
+  }
+
+  public MenuItem updateMenuItem(Long id, MenuItem updatedMenuItem) {
+    MenuItem menuItem = menuItemRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Menu Item not found with id: " + id));
+
+    menuItem.setName(updatedMenuItem.getName());
+    menuItem.setPrice(updatedMenuItem.getPrice());
+    menuItem.setDescription(updatedMenuItem.getDescription());
+
+    return menuItemRepository.save(menuItem);
   }
 }
