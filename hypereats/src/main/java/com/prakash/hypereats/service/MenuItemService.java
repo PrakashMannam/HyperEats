@@ -35,13 +35,13 @@ public class MenuItemService {
     return menuItemRepository.findByRestaurantId(restaurantId);
   }
 
-  public MenuItem getMenuItemById(Long id) {
-    return menuItemRepository.findById(id)
+  public MenuItem getMenuItemById(Long restaurantId, Long id) {
+    return menuItemRepository.findByIdAndRestaurantId(id, restaurantId)
         .orElseThrow(() -> new ResourceNotFoundException("Menu Item not found with id: " + id));
   }
 
-  public MenuItem updateMenuItem(Long id, MenuItem updatedMenuItem) {
-    MenuItem menuItem = menuItemRepository.findById(id)
+  public MenuItem updateMenuItem(Long restaurantId, Long id, MenuItem updatedMenuItem) {
+    MenuItem menuItem = menuItemRepository.findByIdAndRestaurantId(id, restaurantId)
         .orElseThrow(() -> new ResourceNotFoundException("Menu Item not found with id: " + id));
 
     menuItem.setName(updatedMenuItem.getName());
@@ -49,5 +49,12 @@ public class MenuItemService {
     menuItem.setDescription(updatedMenuItem.getDescription());
 
     return menuItemRepository.save(menuItem);
+  }
+
+  public void deleteMenuItem(Long restaurantId, Long id) {
+    MenuItem menuItem = menuItemRepository.findByIdAndRestaurantId(id, restaurantId)
+        .orElseThrow(() -> new ResourceNotFoundException("Menu Item not found with id: " + id));
+
+    menuItemRepository.delete(menuItem);
   }
 }

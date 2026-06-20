@@ -2,6 +2,7 @@ package com.prakash.hypereats.controller;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,12 +37,22 @@ public class MenuItemController {
   }
 
   @GetMapping("/{id}")
-  public MenuItem getMenuItemById(@PathVariable Long id) {
-    return menuItemService.getMenuItemById(id);
+  public MenuItem getMenuItemById(@PathVariable Long restaurantId, @PathVariable Long id) {
+    return menuItemService.getMenuItemById(restaurantId, id);
   }
 
   @PutMapping("/{id}")
-  public MenuItem updateMenuItem(@PathVariable Long id, @Valid @RequestBody MenuItem updatedMenuItem) {
-    return menuItemService.updateMenuItem(id, updatedMenuItem);
+  public MenuItem updateMenuItem(
+      @PathVariable Long restaurantId,
+      @PathVariable Long id,
+      @Valid @RequestBody MenuItem updatedMenuItem) {
+    return menuItemService.updateMenuItem(restaurantId, id, updatedMenuItem);
+  }
+
+  @DeleteMapping("/{id}")
+  public String deleteMenuItem(@PathVariable Long restaurantId, @PathVariable Long id) {
+    menuItemService.deleteMenuItem(restaurantId, id);
+
+    return "Menu item deleted successfully";
   }
 }
