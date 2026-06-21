@@ -24,14 +24,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<List<String>> handleValidationException(MethodArgumentNotValidException exception) {
         // Pick the first field error and read the custom message from the annotation.
         List<String> messages = exception.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(error -> error.getDefaultMessage())
-            .toList();
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getDefaultMessage())
+                .toList();
 
         // Send a clean 400 Bad Request response instead of Spring's long default error.
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(messages);
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(exception.getMessage());
     }
 }

@@ -10,18 +10,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prakash.hypereats.entity.FoodOrder;
+import com.prakash.hypereats.entity.OrderItem;
 import com.prakash.hypereats.service.FoodOrderService;
 
 @RestController
 @RequestMapping("/orders")
 public class FoodOrderController {
-  
+
   private final FoodOrderService foodOrderService;
 
   public FoodOrderController(FoodOrderService foodOrderService) {
     this.foodOrderService = foodOrderService;
   }
-    
+
   @PostMapping("/users/{userId}/restaurants/{restaurantId}")
   public FoodOrder createOrder(@PathVariable Long userId, @PathVariable Long restaurantId) {
     return foodOrderService.createOrder(userId, restaurantId);
@@ -41,5 +42,20 @@ public class FoodOrderController {
   public String cancelOrderById(@PathVariable Long id) {
     foodOrderService.deleteOrderById(id);
     return "Order cancelled successfully";
+  }
+
+  @GetMapping("/{id}/items")
+  public List<OrderItem> getOrderItems(@PathVariable Long id) {
+    return foodOrderService.getOrderItems(id);
+  }
+
+  @PostMapping("/{orderId}/items/{menuItemId}/quantity/{quantity}")
+  public OrderItem addItemToOrder(
+    @PathVariable Long orderId,
+    @PathVariable Long menuItemId,
+    @PathVariable Integer quantity
+  ) {
+    return foodOrderService.addItemToOrder(orderId, menuItemId, quantity);
+
   }
 }
