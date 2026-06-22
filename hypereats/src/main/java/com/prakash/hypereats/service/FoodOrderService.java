@@ -79,7 +79,6 @@ public class FoodOrderService {
   }
 
   public OrderItem addItemToOrder(Long orderId, Long menuItemId, Integer quantity) {
-    
 
     if (quantity < 1) {
       throw new IllegalArgumentException("Quantity must be at least 1");
@@ -100,5 +99,14 @@ public class FoodOrderService {
     orderItem.setPriceAtOrderTime(menuItem.getPrice());
 
     return orderItemRepository.save(orderItem);
+  }
+  
+  public FoodOrder updateOrderStatus(Long id, OrderStatus status) {
+    FoodOrder order = foodOrderRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Order with id: " + id + " not found"));
+
+    order.setStatus(status);
+
+    return foodOrderRepository.save(order);
   }
 }

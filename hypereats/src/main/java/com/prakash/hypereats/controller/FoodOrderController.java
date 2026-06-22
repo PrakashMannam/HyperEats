@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prakash.hypereats.entity.FoodOrder;
 import com.prakash.hypereats.entity.OrderItem;
+import com.prakash.hypereats.entity.OrderStatus;
 import com.prakash.hypereats.service.FoodOrderService;
 
 @RestController
@@ -51,11 +53,14 @@ public class FoodOrderController {
 
   @PostMapping("/{orderId}/items/{menuItemId}/quantity/{quantity}")
   public OrderItem addItemToOrder(
-    @PathVariable Long orderId,
-    @PathVariable Long menuItemId,
-    @PathVariable Integer quantity
-  ) {
+      @PathVariable Long orderId,
+      @PathVariable Long menuItemId,
+      @PathVariable Integer quantity) {
     return foodOrderService.addItemToOrder(orderId, menuItemId, quantity);
+  }
 
+  @PutMapping("/{id}/status/{status}")
+  public FoodOrder updateOrderStatus(@PathVariable Long id, @PathVariable OrderStatus status) {
+    return foodOrderService.updateOrderStatus(id, status);
   }
 }
