@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.prakash.hypereats.dto.OrderItemResponse;
 import com.prakash.hypereats.entity.FoodOrder;
 import com.prakash.hypereats.entity.OrderItem;
 import com.prakash.hypereats.entity.OrderStatus;
@@ -71,14 +72,17 @@ public class FoodOrderService {
     foodOrderRepository.delete(order);
   }
 
-  public List<OrderItem> getOrderItems(Long orderId) {
+  public List<OrderItemResponse> getOrderItems(Long orderId) {
     FoodOrder order = foodOrderRepository.findById(orderId)
         .orElseThrow(() -> new ResourceNotFoundException("Order with id: " + orderId + " not found"));
 
-    return orderItemRepository.findByFoodOrderId(order.getId());
+    return orderItemRepository.findByFoodOrderId(order.getId())
+        .stream()
+        .map(this::mapToOrderItemResponse)
+        .toList();
   }
 
-  public OrderItem addItemToOrder(Long orderId, Long menuItemId, Integer quantity) {
+  public OrderItemResponse addItemToOrder(Long orderId, Long menuItemId, Integer quantity) {
 
     if (quantity < 1) {
       throw new IllegalArgumentException("Quantity must be at least 1");
@@ -98,7 +102,8 @@ public class FoodOrderService {
     orderItem.setQuantity(quantity);
     orderItem.setPriceAtOrderTime(menuItem.getPrice());
 
-    return orderItemRepository.save(orderItem);
+    OrderItem savedOrderItem = orderItemRepository.save(orderItem);
+    return mapToOrderItemResponse(savedOrderItem);
   }
   
   public FoodOrder updateOrderStatus(Long id, OrderStatus status) {
@@ -109,4 +114,17 @@ public class FoodOrderService {
 
     return foodOrderRepository.save(order);
   }
+
+  private OrderItemResponse mapToOrderItemResponse(OrderItem orderItem) {
+    Double totalPrice = orderItem.getPriceAtOrderTime() * orderItem.getQuantity();
+
+    return new OrderItemResponse(
+        orderItem.getId(),
+        orderItem.getMenuItem().getId(),
+        orderItem.getMenuItem().getName(),
+        orderItem.getQuantity(),
+        orderItem.getPriceAtOrderTime(),
+        totalPrice);
+  }
+
 }
