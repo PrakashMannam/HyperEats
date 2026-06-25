@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prakash.hypereats.dto.AddOrderItemRequest;
+import com.prakash.hypereats.dto.OrderItemResponse;
 import com.prakash.hypereats.entity.FoodOrder;
-import com.prakash.hypereats.entity.OrderItem;
 import com.prakash.hypereats.entity.OrderStatus;
 import com.prakash.hypereats.service.FoodOrderService;
 
@@ -51,12 +51,12 @@ public class FoodOrderController {
   }
 
   @GetMapping("/{id}/items")
-  public List<OrderItem> getOrderItems(@PathVariable Long id) {
+  public List<OrderItemResponse> getOrderItems(@PathVariable Long id) {
     return foodOrderService.getOrderItems(id);
   }
 
   @PostMapping("/{orderId}/items") // old: "/{orderId}/items/{menuItemId}/quantity/{quantity}"
-  public OrderItem addItemToOrder(
+  public OrderItemResponse addItemToOrder(
       @PathVariable Long orderId,
       @Valid @RequestBody AddOrderItemRequest request) {
 
