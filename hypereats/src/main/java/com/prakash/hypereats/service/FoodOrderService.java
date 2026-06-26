@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.prakash.hypereats.dto.FoodOrderResponse;
 import com.prakash.hypereats.dto.OrderItemResponse;
 import com.prakash.hypereats.entity.FoodOrder;
 import com.prakash.hypereats.entity.OrderItem;
@@ -41,7 +42,7 @@ public class FoodOrderService {
     this.menuItemRepository = menuItemRepository;
   }
 
-  public FoodOrder createOrder(Long userId, Long restaurantId) {
+  public FoodOrderResponse createOrder(Long userId, Long restaurantId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
@@ -53,16 +54,22 @@ public class FoodOrderService {
     order.setRestaurant(restaurant);
     order.setStatus(OrderStatus.PENDING);
 
-    return foodOrderRepository.save(order);
+    FoodOrder savedOrder = foodOrderRepository.save(order);
+    return mapToFoodOrderResponse(savedOrder);
   }
 
-  public List<FoodOrder> getAllOrders() {
-    return foodOrderRepository.findAll();
+  public List<FoodOrderResponse> getAllOrders() {
+    return foodOrderRepository.findAll()
+        .stream()
+        .map(this::mapToFoodOrderResponse)
+        .toList();
   }
 
-  public FoodOrder getOrderById(Long id) {
-    return foodOrderRepository.findById(id)
+  public FoodOrderResponse getOrderById(Long id) {
+    FoodOrder order = foodOrderRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Order with id: " + id + " not found"));
+
+    return mapToFoodOrderResponse(order);
   }
 
   public void deleteOrderById(Long id) {
@@ -105,14 +112,16 @@ public class FoodOrderService {
     OrderItem savedOrderItem = orderItemRepository.save(orderItem);
     return mapToOrderItemResponse(savedOrderItem);
   }
-  
-  public FoodOrder updateOrderStatus(Long id, OrderStatus status) {
+
+  public FoodOrderResponse updateOrderStatus(Long id, OrderStatus status) {
     FoodOrder order = foodOrderRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Order with id: " + id + " not found"));
 
     order.setStatus(status);
 
-    return foodOrderRepository.save(order);
+    FoodOrder updatedOrder = foodOrderRepository.save(order);
+    
+    return mapToFoodOrderResponse(updatedOrder);
   }
 
   private OrderItemResponse mapToOrderItemResponse(OrderItem orderItem) {
@@ -127,4 +136,49 @@ public class FoodOrderService {
         totalPrice);
   }
 
+  private FoodOrderResponse mapToFoodOrderResponse(FoodOrder order) {
+    return new FoodOrderResponse(
+        order.getId(),
+        order.getUser().getId(),
+        order.getUser().getName(),
+        order.getRestaurant().getId(),
+        order.getRestaurant().getName(),
+        order.getStatus());
+  }
+
+  public FoodOrder getExistingOrder(Long id) {
+    return foodOrderRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Order with id: \" + id + \" not found"));
+  }
+
+  public FoodOrderResponse acceptOrder(Long id) {
+    FoodOrder order = getExistingOrder(id);
+
+    order.setStatus(OrderStatus.ACCEPTED);
+    return mapToFoodOrderResponse(foodOrderRepository.save(order));
+  }
+
+  public FoodOrderResponse markPreparing(Long id) {
+    FoodOrder order = getExistingOrder(id);
+    order.setStatus(OrderStatus.PREPARING);
+    return mapToFoodOrderResponse(foodOrderRepository.save(order));
+  }
+
+  public FoodOrderResponse markReady(Long id) {
+    FoodOrder order = getExistingOrder(id);
+    order.setStatus(OrderStatus.READY);
+    return mapToFoodOrderResponse(foodOrderRepository.save(order));
+  }
+
+  public FoodOrderResponse markPickedUp(Long id) {
+    FoodOrder order = getExistingOrder(id);
+    order.setStatus(OrderStatus.PICKED_UP);
+    return mapToFoodOrderResponse(foodOrderRepository.save(order));
+  }
+
+  public FoodOrderResponse markDelivered(Long id) {
+    FoodOrder order = getExistingOrder(id);
+    order.setStatus(OrderStatus.DELIVERED);
+    return mapToFoodOrderResponse(foodOrderRepository.save(order));
+  }
 }

@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prakash.hypereats.dto.AddOrderItemRequest;
+import com.prakash.hypereats.dto.FoodOrderResponse;
 import com.prakash.hypereats.dto.OrderItemResponse;
-import com.prakash.hypereats.entity.FoodOrder;
-import com.prakash.hypereats.entity.OrderStatus;
 import com.prakash.hypereats.service.FoodOrderService;
 
 import jakarta.validation.Valid;
@@ -30,17 +29,17 @@ public class FoodOrderController {
   }
 
   @PostMapping("/users/{userId}/restaurants/{restaurantId}")
-  public FoodOrder createOrder(@PathVariable Long userId, @PathVariable Long restaurantId) {
+  public FoodOrderResponse createOrder(@PathVariable Long userId, @PathVariable Long restaurantId) {
     return foodOrderService.createOrder(userId, restaurantId);
   }
 
   @GetMapping
-  public List<FoodOrder> getAllOrders() {
+  public List<FoodOrderResponse> getAllOrders() {
     return foodOrderService.getAllOrders();
   }
 
   @GetMapping("/{id}")
-  public FoodOrder getOrderById(@PathVariable Long id) {
+  public FoodOrderResponse getOrderById(@PathVariable Long id) {
     return foodOrderService.getOrderById(id);
   }
 
@@ -66,8 +65,28 @@ public class FoodOrderController {
         request.getQuantity());
   }
 
-  @PutMapping("/{id}/status/{status}")
-  public FoodOrder updateOrderStatus(@PathVariable Long id, @PathVariable OrderStatus status) {
-    return foodOrderService.updateOrderStatus(id, status);
+  @PutMapping("/{id}/accept")
+  public FoodOrderResponse acceptOrder(@PathVariable Long id) {
+    return foodOrderService.acceptOrder(id);
+  }
+  
+  @PutMapping("/{id}/prepare")
+  public FoodOrderResponse markPreparing(@PathVariable Long id) {
+    return foodOrderService.markPreparing(id);
+  }
+
+  @PutMapping("/{id}/ready")
+  public FoodOrderResponse markReady(@PathVariable Long id) {
+    return foodOrderService.markReady(id);
+  }
+
+  @PutMapping("/{id}/pickup")
+  public FoodOrderResponse markPickedUp(@PathVariable Long id) {
+    return foodOrderService.markPickedUp(id);
+  }
+
+  @PutMapping("/{id}/deliver")
+  public FoodOrderResponse markDelivered(@PathVariable Long id) {
+    return foodOrderService.markDelivered(id);
   }
 }
