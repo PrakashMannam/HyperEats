@@ -148,11 +148,15 @@ public class FoodOrderService {
 
   public FoodOrder getExistingOrder(Long id) {
     return foodOrderRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Order with id: \" + id + \" not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Order with id: " + id + " not found"));
   }
 
   public FoodOrderResponse acceptOrder(Long id) {
     FoodOrder order = getExistingOrder(id);
+
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new IllegalArgumentException("Only pending orders can be accepted");
+    }
 
     order.setStatus(OrderStatus.ACCEPTED);
     return mapToFoodOrderResponse(foodOrderRepository.save(order));
@@ -160,24 +164,43 @@ public class FoodOrderService {
 
   public FoodOrderResponse markPreparing(Long id) {
     FoodOrder order = getExistingOrder(id);
+    if (order.getStatus() != OrderStatus.ACCEPTED) {
+      throw new IllegalArgumentException("Only accepted orders can be marked as preparing");
+    }
+
     order.setStatus(OrderStatus.PREPARING);
     return mapToFoodOrderResponse(foodOrderRepository.save(order));
   }
 
   public FoodOrderResponse markReady(Long id) {
     FoodOrder order = getExistingOrder(id);
+
+    if (order.getStatus() != OrderStatus.PREPARING) {
+      throw new IllegalArgumentException("Only preparing orders can be marked as ready");
+    }
+
     order.setStatus(OrderStatus.READY);
     return mapToFoodOrderResponse(foodOrderRepository.save(order));
   }
 
   public FoodOrderResponse markPickedUp(Long id) {
     FoodOrder order = getExistingOrder(id);
+
+    if (order.getStatus() != OrderStatus.READY) {
+      throw new IllegalArgumentException("Only ready orders can be picked up");
+    }
+
     order.setStatus(OrderStatus.PICKED_UP);
     return mapToFoodOrderResponse(foodOrderRepository.save(order));
   }
 
   public FoodOrderResponse markDelivered(Long id) {
     FoodOrder order = getExistingOrder(id);
+
+    if (order.getStatus() != OrderStatus.PICKED_UP) {
+      throw new IllegalArgumentException("Only picked up orders can be marked as delivered");
+    }
+    
     order.setStatus(OrderStatus.DELIVERED);
     return mapToFoodOrderResponse(foodOrderRepository.save(order));
   }
