@@ -89,4 +89,9 @@ public class FoodOrderController {
   public FoodOrderResponse markDelivered(@PathVariable Long id) {
     return foodOrderService.markDelivered(id);
   }
+
+  @PutMapping("/{id}/cancel")
+  public FoodOrderResponse cancelOrder(@PathVariable Long id) {
+    return foodOrderService.cancelOrder(id);
+  }
 }

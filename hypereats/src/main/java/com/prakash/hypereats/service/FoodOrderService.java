@@ -200,8 +200,18 @@ public class FoodOrderService {
     if (order.getStatus() != OrderStatus.PICKED_UP) {
       throw new IllegalArgumentException("Only picked up orders can be marked as delivered");
     }
-    
+
     order.setStatus(OrderStatus.DELIVERED);
+    return mapToFoodOrderResponse(foodOrderRepository.save(order));
+  }
+  
+  public FoodOrderResponse cancelOrder(Long id) {
+    FoodOrder order = getExistingOrder(id);
+
+    if(order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.ACCEPTED)
+      throw new IllegalArgumentException("Only Pending and Accepted orders can be cancelled");
+
+    order.setStatus(OrderStatus.CANCELLED);
     return mapToFoodOrderResponse(foodOrderRepository.save(order));
   }
 }
